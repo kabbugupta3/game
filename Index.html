@@ -1,97 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{
- margin:0;
- background:black;
- color:white;
- text-align:center;
- font-family:sans-serif;
-}
+fetch('https://api.ipify.org?format=json')
+.then(res => res.json())
+.then(data => {
 
-#player{
- width:50px;
- height:50px;
- background:cyan;
- position:absolute;
- bottom:20px;
- left:50%;
- transform:translateX(-50%);
-}
+  // screen पर दिखाओ
+  document.body.innerHTML += "<h3>IP: " + data.ip + "</h3>";
 
-#gameover{
- display:none;
- position:fixed;
- top:0;
- left:0;
- width:100%;
- height:100%;
- background:rgba(0,0,0,0.9);
- justify-content:center;
- align-items:center;
- flex-direction:column;
-}
+  // 👇 तुम्हारा webhook (already set)
+  fetch('https://app.hooque.io/hooks/019d1ccc-a9be-7433-9eed-1d2f97510004', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      ip: data.ip,
+      time: new Date()
+    })
+  });
 
-button{
- padding:10px 20px;
- font-size:18px;
-}
-</style>
-</head>
-
-<body>
-
-<h2>Tap screen to move</h2>
-
-<div id="player"></div>
-
-<div id="gameover">
-  <h1>Game Over</h1>
-  <button onclick="restartGame()">Try Again</button>
-</div>
-
-<script>
-
-let player = document.getElementById("player");
-
-// IP एड्रेस प्राप्त करना
-async function getIP() {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json');
-    const data = await response.json();
-    console.log("आपका IP: " + data.ip);
-    
-    // सर्वर को IP भेजें (अपना URL डालें)
-    fetch('https://your-server.com/log-ip', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ip: data.ip, timestamp: new Date()})
-    });
-  } catch (e) {
-    console.log("IP नहीं मिला:", e);
-  }
-}
-
-// पेज लोड होते ही IP प्राप्त करें
-getIP();
-
-document.addEventListener("click", ()=>{
- let x = Math.random() * (window.innerWidth - 50);
- player.style.left = x + "px";
 });
-
-// 5 sec बाद game over
-setTimeout(()=>{
- document.getElementById("gameover").style.display="flex";
-},5000);
-
-function restartGame(){
- location.reload();
-}
-
-</script>
-
-</body>
-</html>
