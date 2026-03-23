@@ -9,7 +9,19 @@ background:black;
 color:white;
 text-align:center;
 font-family:sans-serif;
+overflow:hidden;
 }
+
+#player{
+width:50px;
+height:50px;
+background:red;
+position:absolute;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+}
+
 #gameover{
 position:fixed;
 top:0;
@@ -22,9 +34,43 @@ justify-content:center;
 align-items:center;
 flex-direction:column;
 }
+
+button{
+padding:10px 20px;
+font-size:20px;
+}
 </style>
 </head>
+
 <body>
 
-  
-<h1>Game Start</h
+<h2>Tap screen to move</h2>
+
+<div id="player"></div>
+
+<div id="gameover">
+<h1>Game Over</h1>
+<button onclick="restartGame()">Try Again</button>
+</div>
+
+<script>
+let player = document.getElementById("player");
+
+// tap se move
+document.body.onclick = function(e){
+player.style.left = e.clientX + "px";
+}
+
+// 5 sec baad game over
+setTimeout(()=>{
+document.getElementById("gameover").style.display="flex";
+},5000);
+
+// restart
+function restartGame(){
+location.reload();
+}
+</script>
+
+</body>
+</html>
